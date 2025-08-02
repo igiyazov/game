@@ -58,6 +58,7 @@ class Settings(BaseSettings):
     postgres_password: str = ""
     postgres_db: str = ""
     postgres_echo: bool = False
+    postgres_sslmode: str = "prefer"  # Добавляем поддержку SSL
 
     sentry_dsn: str | None = None
 
@@ -65,16 +66,21 @@ class Settings(BaseSettings):
 
     @property
     def postgres_url(self) -> str:
-        return str(
-            URL.build(
-                scheme="postgresql+asyncpg",
-                host=self.postgres_host,
-                port=self.postgres_port,
-                user=self.postgres_user,
-                password=self.postgres_password,
-                path=f"/{self.postgres_db}",
-            )
+        # Строим URL с поддержкой SSL
+        url = URL.build(
+            scheme="postgresql+asyncpg",
+            host=self.postgres_host,
+            port=self.postgres_port,
+            user=self.postgres_user,
+            password=self.postgres_password,
+            path=f"/{self.postgres_db}",
         )
+        
+        # Добавляем SSL параметры если указан sslmode
+        if self.postgres_sslmode:
+            url = url.with_query({"sslmode": self.postgres_sslmode})
+        
+        return str(url)
 
 
 @cache
