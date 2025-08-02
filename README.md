@@ -4,13 +4,13 @@
 
 ## Архитектура
 
-- **Frontend** - React приложение на порту 3000
+- **Frontend** - React приложение на порту 3001
 - **Backend** - FastAPI сервер на порту 8000
 - **Database** - PostgreSQL на DigitalOcean (внешняя БД)
 
 ## Маршрутизация
 
-- `http://localhost:3000/` - главная страница (React)
+- `http://localhost:3001/` - главная страница (React)
 - `http://localhost:8000/` - API бэкенда (FastAPI)
 - `http://localhost:8000/docs` - Swagger документация API
 
@@ -72,7 +72,7 @@ docker-compose up -d
 ```
 
 4. Откройте браузер и перейдите по адресу:
-   - `http://localhost:3000/` - главная страница
+   - `http://localhost:3001/` - главная страница
    - `http://localhost:8000/docs` - API документация
 
 ## Остановка
@@ -155,4 +155,12 @@ ls -la .env
 Если возникают проблемы с SSL соединением к БД:
 1. Убедитесь, что `POSTGRES_SSLMODE=require`
 2. Проверьте, что сертификаты DigitalOcean актуальны
-3. Попробуйте перезапустить контейнеры: `docker-compose restart` 
+3. Попробуйте перезапустить контейнеры: `docker-compose restart`
+
+### Проблемы с портами
+
+Если порт 3001 занят, измените его в `docker-compose.yml`:
+```yaml
+ports:
+  - "3002:3000"  # Измените 3001 на 3002
+``` 
