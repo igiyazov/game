@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 50%, #0f0519 100%);
+  min-height: 100vh;
+}
+
+.casino-bg {
+  background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 50%, #0f0519 100%);
+  min-height: 100vh;
+}
+
+.game-card {
+  background: linear-gradient(145deg, #2d1b4e, #1a0b2e);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.2);
+}

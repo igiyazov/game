@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # База данных PostgreSQL
+  postgres:
+    image: postgres:16
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: casino
+      POSTGRES_USER: casino_user
+      POSTGRES_PASSWORD: casino_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - casino_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U casino_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Бэкенд FastAPI
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: casino
+      POSTGRES_USER: casino_user
+      POSTGRES_PASSWORD: casino_password
+      DATABASE_URL: postgresql://casino_user:casino_password@postgres:5432/casino
+    networks:
+      - casino_network
+    restart: unless-stopped
+
+  # Фронтенд React с интегрированной игрой 21
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - casino_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  casino_network:
+    driver: bridge 
