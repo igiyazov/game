@@ -34,7 +34,7 @@ services:
       - "traefik.http.routers.backend-secure.entrypoints=https" # Secure entrypoint for HTTPS
       - "traefik.http.routers.backend-secure.rule=Host(`api.pyramidgames.fun`)"  # Host rule for secure routing
       - "traefik.http.routers.backend-secure.tls=true" # Enable TLS for secure connection
-      - "traefik.http.routers.backend-secure.service=api@internal" # Internal service for Traefik API
+      - "traefik.http.routers.backend-secure.service=backend" # Internal service for Traefik API
       - "traefik.http.services.backend.loadbalancer.server.port=8000" # Internal service for Traefik API
       - "traefik.docker.network=proxy" # Internal service for Traefik API
 
