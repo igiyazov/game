@@ -52,6 +52,20 @@ services:
     networks:
       - proxy
     restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels: 
+      - "traefik.enable=true" # Enable Traefik on this service
+      - "traefik.http.routers.frontend.entrypoints=http" # Define HTTP entrypoint
+      - "traefik.http.routers.frontend.rule=Host(`pyramidgames.fun`)" # Host rule for routing
+      - "traefik.http.middlewares.frontend-https-redirect.redirectscheme.scheme=https" # Redirect HTTP to HTTPS
+      - "traefik.http.routers.frontend.middlewares=frontend-https-redirect" # Apply HTTPS redirect middleware
+      - "traefik.http.routers.frontend-secure.entrypoints=https" # Secure entrypoint for HTTPS
+      - "traefik.http.routers.frontend-secure.rule=Host(`pyramidgames.fun`)"  # Host rule for secure routing
+      - "traefik.http.routers.frontend-secure.tls=true" # Enable TLS for secure connection
+      - "traefik.http.routers.frontend-secure.service=frontend" # Internal service for Traefik API
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000" # Internal service for Traefik API
+      - "traefik.docker.network=proxy" # Internal service for Traefik API
 
   # Игра 21 (Blackjack)
   game-21:
@@ -63,6 +77,20 @@ services:
     networks:
       - proxy
     restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels: 
+      - "traefik.enable=true" # Enable Traefik on this service
+      - "traefik.http.routers.game-21.entrypoints=http" # Define HTTP entrypoint
+      - "traefik.http.routers.game-21.rule=Host(`pyramidgames.fun`) && PathPrefix(`/games/21`)" # Host rule for routing
+      - "traefik.http.middlewares.game-21-https-redirect.redirectscheme.scheme=https" # Redirect HTTP to HTTPS
+      - "traefik.http.routers.game-21.middlewares=game-21-https-redirect" # Apply HTTPS redirect middleware
+      - "traefik.http.routers.game-21-secure.entrypoints=https" # Secure entrypoint for HTTPS
+      - "traefik.http.routers.game-21-secure.rule=Host(`pyramidgames.fun`) && PathPrefix(`/games/21`)"  # Host rule for secure routing
+      - "traefik.http.routers.game-21-secure.tls=true" # Enable TLS for secure connection
+      - "traefik.http.routers.game-21-secure.service=game-21" # Internal service for Traefik API
+      - "traefik.http.services.game-21.loadbalancer.server.port=5000" # Internal service for Traefik API
+      - "traefik.docker.network=proxy" # Internal service for Traefik API
 
 volumes:
   postgres_data:
