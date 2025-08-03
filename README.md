@@ -6,6 +6,7 @@
 
 - **Frontend** - React приложение на порту 3001
 - **Backend** - FastAPI сервер на порту 8000
+- **Game 21** - игра в Blackjack на порту 5001
 - **Database** - PostgreSQL на DigitalOcean (внешняя БД)
 
 ## Маршрутизация
@@ -13,6 +14,7 @@
 - `http://localhost:3001/` - главная страница (React)
 - `http://localhost:8000/` - API бэкенда (FastAPI)
 - `http://localhost:8000/docs` - Swagger документация API
+- `http://localhost:5001/` - игра в 21 (Blackjack)
 
 ## База данных
 
@@ -74,6 +76,7 @@ docker-compose up -d
 4. Откройте браузер и перейдите по адресу:
    - `http://localhost:3001/` - главная страница
    - `http://localhost:8000/docs` - API документация
+   - `http://localhost:5001/` - игра в 21
 
 ## Остановка
 
@@ -90,6 +93,7 @@ docker-compose logs -f
 # Конкретный сервис
 docker-compose logs -f backend
 docker-compose logs -f frontend
+docker-compose logs -f game-21
 ```
 
 ## Структура проекта
@@ -163,4 +167,10 @@ ls -la .env
 ```yaml
 ports:
   - "3002:3000"  # Измените 3001 на 3002
+```
+
+Если порт 5001 занят, измените его в `docker-compose.yml`:
+```yaml
+ports:
+  - "5002:5000"  # Измените 5001 на 5002
 ``` 

@@ -23,7 +23,7 @@ services:
       SENTRY_DSN: ${SENTRY_DSN}
       PROMETHEUS_METRICS_KEY: ${PROMETHEUS_METRICS_KEY}
     networks:
-      - casino_network
+      - proxy
     restart: unless-stopped
 
   # Фронтенд React с интегрированной игрой 21
@@ -38,12 +38,27 @@ services:
     depends_on:
       - backend
     networks:
-      - casino_network
+      - proxy
+    restart: unless-stopped
+
+  # Игра 21 (Blackjack)
+  game-21:
+    build:
+      context: ./game
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5000"
+    networks:
+      - proxy
     restart: unless-stopped
 
 volumes:
   postgres_data:
 
 networks:
-  casino_network:
-    driver: bridge 
+  proxy:
+    name: proxy # Specifies the external network to connect to
+    external: true # Indicates that the network is external
+
+
+    # 3jepYKmWzrpkHlIz5_edM1yMA9UdXbALBKE39-jH
