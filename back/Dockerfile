@@ -32,6 +32,6 @@ COPY ./src /app/src
 
 RUN chgrp -R 0 /app && chmod -R g=u /app
 
-EXPOSE 8000
+# EXPOSE 8000
 
 ENTRYPOINT ["sh", "-c", "alembic upgrade head && uvicorn app:create_app --proxy-headers --workers=2 --loop uvloop --http httptools --host 0.0.0.0 --port 8000"]
