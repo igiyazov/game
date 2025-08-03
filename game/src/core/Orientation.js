@@ -11,10 +11,10 @@ export default class {
     }
 
     init() {
-        let image = `url(images/web/play_${this.lock}.png)`;
+        // let image = `url(images/web/play_${this.lock}.png)`;
 
         let div = document.getElementById('turn');
-        div.style.backgroundImage = image;
+        // div.style.backgroundImage = image;
 
         if (!this.isCorrect) {
             div.style.display = 'block';
