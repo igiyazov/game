@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export default class ApiClient {
     constructor() {
-        this.baseURL = 'http://localhost:8000';
+        this.baseURL = 'https://api.pyramidgames.fun';
         
         // Создаем экземпляр axios с базовой конфигурацией
         this.client = axios.create({

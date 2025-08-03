@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 export default function Game({ gameTitle, onBack }) {
 	useEffect(() => {
 		// Перенаправляем на игру в том же окне
-		window.location.href = 'http://localhost:5001';
+		window.location.href = 'https://game.pyramidgames.fun';
 	}, []);
 
 	return (
