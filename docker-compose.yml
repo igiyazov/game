@@ -4,8 +4,8 @@ services:
     build:
       context: ./back
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
@@ -23,14 +23,26 @@ services:
     networks:
       - proxy
     restart: unless-stopped
+    labels: 
+      - "traefik.enable=true" # Enable Traefik on this service
+      - "traefik.http.routers.backend.entrypoints=http" # Define HTTP entrypoint
+      - "traefik.http.routers.backend.rule=Host(`api.pyramidgames.fun`)" # Host rule for routing
+      - "traefik.http.middlewares.backend-https-redirect.redirectscheme.scheme=https" # Redirect HTTP to HTTPS
+      - "traefik.http.routers.backend.middlewares=backend-https-redirect" # Apply HTTPS redirect middleware
+      - "traefik.http.routers.backend-secure.entrypoints=https" # Secure entrypoint for HTTPS
+      - "traefik.http.routers.backend-secure.rule=Host(`api.pyramidgames.fun`)"  # Host rule for secure routing
+      - "traefik.http.routers.backend-secure.tls=true" # Enable TLS for secure connection
+      - "traefik.http.routers.backend-secure.service=api@internal" # Internal service for Traefik API
+      - "traefik.http.services.backend.loadbalancer.server.port=8000" # Internal service for Traefik API
+      - "traefik.docker.network=proxy" # Internal service for Traefik API
 
   # Фронтенд React с интегрированной игрой 21
   frontend:
     build:
       context: ./front
       dockerfile: Dockerfile
-    ports:
-      - "3001:3000"
+    # ports:
+    #   - "3001:3000"
     environment:
       REACT_APP_API_URL: http://localhost:8000
     depends_on:
@@ -44,8 +56,8 @@ services:
     build:
       context: ./game
       dockerfile: Dockerfile
-    ports:
-      - "5001:5000"
+    # ports:
+    #   - "5001:5000"
     networks:
       - proxy
     restart: unless-stopped
