@@ -23,6 +23,8 @@ services:
     networks:
       - proxy
     restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels: 
       - "traefik.enable=true" # Enable Traefik on this service
       - "traefik.http.routers.backend.entrypoints=http" # Define HTTP entrypoint
