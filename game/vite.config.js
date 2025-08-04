@@ -11,6 +11,7 @@ export default defineConfig({
   
   // Точка входа - Vite автоматически найдет index.html
   build: {
+    minify: false,
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
