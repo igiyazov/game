@@ -47,4 +47,28 @@ README.md
 *.md
 
 # Deploy
-deploy/ 
+deploy/
+
+# Дополнительные оптимизации
+# Тесты
+tests/
+test/
+__tests__/
+*.test.js
+*.spec.js
+
+# Конфигурационные файлы разработки
+.eslintrc*
+.prettierrc*
+.babelrc*
+tsconfig.json
+
+# Кэш
+.cache/
+.parcel-cache/
+
+# Coverage
+coverage/
+
+# Локальные файлы
+*.local 

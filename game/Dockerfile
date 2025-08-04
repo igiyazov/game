@@ -1,10 +1,12 @@
-# Используем Node.js образ
-FROM node:18-alpine
+# Multi-stage build для оптимизации размера и скорости
+
+# Stage 1: Build stage
+FROM node:20-alpine AS builder
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем файлы зависимостей
+# Копируем файлы зависимостей (для лучшего кэширования)
 COPY package*.json ./
 
 # Устанавливаем зависимости
@@ -16,11 +18,17 @@ COPY . .
 # Собираем проект
 RUN npm run build
 
-# Устанавливаем serve глобально
-RUN npm install -g serve
+# Stage 2: Production stage
+FROM nginx:alpine
 
-# # Открываем порт
-# EXPOSE 5000
+# Копируем собранные файлы из builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Запускаем статический сервер
-CMD ["serve", "-s", "dist", "-l", "5000"] 
+# Копируем конфигурацию nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Открываем порт
+EXPOSE 80
+
+# Запускаем nginx
+CMD ["nginx", "-g", "daemon off;"] 
