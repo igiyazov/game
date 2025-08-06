@@ -89,7 +89,7 @@ services:
       - "traefik.http.routers.game-21-secure.rule=Host(`game.pyramidgames.fun`)"  # Host rule for secure routing
       - "traefik.http.routers.game-21-secure.tls=true" # Enable TLS for secure connection
       - "traefik.http.routers.game-21-secure.service=game-21" # Internal service for Traefik API
-      - "traefik.http.services.game-21.loadbalancer.server.port=5000" # Internal service for Traefik API
+      - "traefik.http.services.game-21.loadbalancer.server.port=80" # Internal service for Traefik API
       - "traefik.docker.network=proxy" # Internal service for Traefik API
 
 volumes:
