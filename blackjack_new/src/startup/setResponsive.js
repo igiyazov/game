@@ -1,4 +1,4 @@
-const isMobile = require('is-mobile');
+import isMobile from 'is-mobile';
 
 export default function (config) {
     if (isMobile({ tablet: true })) {

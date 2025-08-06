@@ -7,8 +7,10 @@ export default class Hand extends Phaser.GameObjects.Container {
         this.scene.layers.cards.add(this);
 
         this.cards = [];
-
         this.positionY = positionY;
+        
+        // Счет очков от API (будет обновляться)
+        this._score = 0;
 
         this.setup();
     }
@@ -51,9 +53,28 @@ export default class Hand extends Phaser.GameObjects.Container {
         this.updateSum();
     }
 
-    updateSum() {
-        this.shadow.setText(this.sum);
-        this.label.setText(this.sum);
+    /**
+     * Обновить отображение суммы очков
+     * @param {number} score - Счет от API (опционально)
+     */
+    updateSum(score = null) {
+        if (score !== null) {
+            this._score = score;
+        } else {
+            // Если счет не передан, вычисляем локально (для совместимости)
+            this._score = this.calculateLocalSum();
+        }
+        
+        this.shadow.setText(this._score);
+        this.label.setText(this._score);
+    }
+
+    /**
+     * Локальный подсчет очков (для совместимости)
+     */
+    calculateLocalSum() {
+        if (this.cards.length === 2 && sumBy(this.cards, 'value') === 22) return 21;
+        return sumBy(this.cards, 'value');
     }
 
     async clear() {
@@ -65,11 +86,16 @@ export default class Hand extends Phaser.GameObjects.Container {
         await Promise.all(jobs);
     }
 
+    /**
+     * Получить текущую сумму очков
+     */
     get sum() {
-        if (this.cards.length === 2 && sumBy(this.cards, 'value') === 22) return 21;
-        return sumBy(this.cards, 'value');
+        return this._score || this.calculateLocalSum();
     }
 
+    /**
+     * Проверить перебор
+     */
     get bust() {
         return this.sum > 21;
     }

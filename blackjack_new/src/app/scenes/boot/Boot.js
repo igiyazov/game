@@ -10,8 +10,8 @@ export default class extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('preload_logo', 'assets/images/preload/logo.png');
-        this.load.image('preload_bar', 'assets/images/preload/bar.png');
+        this.load.image('preload_logo', 'images/preload/logo.png');
+        this.load.image('preload_bar', 'images/preload/bar.png');
     }
 
     create() {

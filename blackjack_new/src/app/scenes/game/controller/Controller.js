@@ -1,6 +1,6 @@
-import Deck from '../cards/Deck';
 import Hand from '../hands/Hand';
 import Result from '../popups/Result';
+import ApiClient from '../../../../core/ApiClient';
 
 export default class Controller {
     constructor(scene) {
@@ -13,8 +13,10 @@ export default class Controller {
         this.maxbet = this.rules.maxbet;
 
         this.currentBet = 0;
-        this.deck = [];
         this.hands = {};
+
+        // Создаем API клиент
+        this.apiClient = new ApiClient();
 
         this.scene.events.on('add_bet', this.onAddBet, this);
         this.scene.events.on('clear_bet', this.onClearBet, this);
@@ -23,8 +25,6 @@ export default class Controller {
         this.scene.events.on('stop', this.onStop, this);
 
         this.scene.events.emit('set_maxbet', this.maxbet);
-
-        // this.deal();
     }
 
     startRound() {
@@ -57,62 +57,77 @@ export default class Controller {
 
         await this.scene.game.utils.wait(500);
 
-        this.deck = new Deck();
-        this.hands.player = new Hand(this.scene, 720);
-        this.hands.dealer = new Hand(this.scene, 220);
+        try {
+            // Начинаем новую игру через API
+            const gameData = await this.apiClient.startGame();
+            
+            // Создаем руки для отображения
+            this.hands.player = new Hand(this.scene, 720);
+            this.hands.dealer = new Hand(this.scene, 220);
 
-        // draw player cards
-        this.hands.player.addCard(this.deck.draw());
-        await this.hands.player.shiftCards();
-        this.hands.player.addCard(this.deck.draw());
-        await this.hands.player.shiftCards();
+            // Отображаем карты игрока
+            for (const card of gameData.player_cards) {
+                this.hands.player.addCard(card);
+                await this.hands.player.shiftCards();
+                await this.scene.game.utils.wait(200);
+            }
+            // Обновляем счет игрока от API
+            this.hands.player.updateSum(gameData.player_score);
 
-        await this.scene.game.utils.wait(500);
+            await this.scene.game.utils.wait(500);
 
-        // draw dealer cards
-        this.hands.dealer.addCard(this.deck.draw());
-        await this.hands.dealer.shiftCards();
-        this.hands.dealer.addCard(this.deck.draw());
-        await this.hands.dealer.shiftCards();
+            // Отображаем карты дилера
+            for (const card of gameData.dealer_cards) {
+                this.hands.dealer.addCard(card);
+                await this.hands.dealer.shiftCards();
+                await this.scene.game.utils.wait(200);
+            }
+            // Обновляем счет дилера от API
+            this.hands.dealer.updateSum(gameData.dealer_score);
 
-        // compare deal
-        let outcome = this.compareDeal(this.hands.player, this.hands.dealer);
-        if (outcome === 'win') return this.onWin();
-        if (outcome === 'draw') return this.onDraw();
-        if (outcome === 'lose') return this.onLose();
+            // Проверяем статус игры
+            if (gameData.status !== 'playing') {
+                await this.handleGameEnd(gameData);
+                return;
+            }
 
-        // console.log('continue');
-        this.scene.events.emit('enable_gameplay_controls');
-    }
+            this.scene.events.emit('enable_gameplay_controls');
 
-    compareDeal(player, dealer) {
-        if ((player.sum === 21 || player.sum === 22) && (dealer.sum === 21 || dealer.sum === 22)) {
-            // both has 21, it's a tie
-            return 'draw';
-        } else if (dealer.sum >= 21 && player.sum < 21) {
-            // dealer wins with 21
-            return 'lose';
-        } else if (dealer.sum < 21 && player.sum >= 21) {
-            // player wins with 21
-            return 'win';
-        } else {
-            return null;
+        } catch (error) {
+            console.error('Ошибка при начале игры:', error);
+            // Возвращаемся к ставкам при ошибке
+            this.scene.events.emit('show_betting_controls');
+            this.scene.events.emit('enable_betting');
         }
     }
 
     async onHit() {
         this.scene.events.emit('disable_gameplay_controls');
 
-        this.hands.player.addCard(this.deck.draw());
-        await this.hands.player.shiftCards();
+        try {
+            // Берем карту через API
+            const result = await this.apiClient.hit();
+            
+            // Добавляем новую карту игроку (последняя в массиве)
+            const newCard = result.player_cards[result.player_cards.length - 1];
+            this.hands.player.addCard(newCard);
+            await this.hands.player.shiftCards();
+            // Обновляем счет игрока от API
+            this.hands.player.updateSum(result.player_score);
 
-        if (this.hands.player.bust) return this.onLose();
-        if (this.hands.player.sum === 21) return this.onStop();
-        if (this.hands.player.cards.length === 5) return this.onStop();
+            // Проверяем статус игры
+            if (result.status !== 'playing') {
+                await this.handleGameEnd(result);
+                return;
+            }
 
-        await this.scene.game.utils.wait(500);
+            await this.scene.game.utils.wait(500);
+            this.scene.events.emit('enable_gameplay_controls');
 
-        this.scene.events.emit('enable_gameplay_controls');
+        } catch (error) {
+            console.error('Ошибка при взятии карты:', error);
+            this.scene.events.emit('enable_gameplay_controls');
+        }
     }
 
     async onStop() {
@@ -120,70 +135,71 @@ export default class Controller {
 
         await this.scene.game.utils.wait(500);
 
-        while (true) {
-            if (this.hands.dealer.sum > 21) return this.onWin();
-            if (this.hands.dealer.sum >= 17) return this.showdown();
-            if (this.hands.dealer.cards.length === 5) return this.onshowdown();
+        try {
+            // Завершаем ход через API
+            const result = await this.apiClient.stand();
+            
+            // Отображаем карты дилера, если появились новые
+            const currentDealerCards = this.hands.dealer.cards.length;
+            if (result.dealer_cards.length > currentDealerCards) {
+                for (let i = currentDealerCards; i < result.dealer_cards.length; i++) {
+                    this.hands.dealer.addCard(result.dealer_cards[i]);
+                    await this.hands.dealer.shiftCards();
+                    await this.scene.game.utils.wait(500);
+                }
+            }
+            // Обновляем счет от API
+            this.hands.player.updateSum(result.player_score);
+            this.hands.dealer.updateSum(result.dealer_score);
 
-            this.hands.dealer.addCard(this.deck.draw());
-            await this.hands.dealer.shiftCards();
+            await this.handleGameEnd(result);
 
-            await this.scene.game.utils.wait(500);
+        } catch (error) {
+            console.error('Ошибка при завершении хода:', error);
+            this.scene.events.emit('enable_gameplay_controls');
         }
     }
 
-    showdown() {
-        if (this.hands.player.sum > this.hands.dealer.sum) return this.onWin();
-        if (this.hands.player.sum === this.hands.dealer.sum) return this.onDraw();
-        if (this.hands.player.sum < this.hands.dealer.sum) return this.onLose();
-    }
-
-    async onWin() {
-        await this.scene.game.utils.wait(1000);
-        this.scene.game.audio.play('sound', 'win');
-
-        let result = new Result(this.scene, 'win');
-        await result.show();
-        result.destroy();
-
-        await this.clearHands();
-        this.credits += this.currentBet * 2;
-
-        this.startRound();
-    }
-
-    async onDraw() {
-        await this.scene.game.utils.wait(1000);
-        this.scene.game.audio.play('sound', 'win');
-
-        let result = new Result(this.scene, 'draw');
-        await result.show();
-        result.destroy();
-
-        await this.clearHands();
-        this.credits += this.currentBet;
-
-        this.startRound();
-    }
-
-    async onLose() {
+    async handleGameEnd(result) {
         await this.scene.game.utils.wait(1000);
 
-        let result = new Result(this.scene, 'lose');
-        await result.show();
-        result.destroy();
+        let resultType;
+        switch (result.status) {
+            case 'win':
+                resultType = 'win';
+                this.scene.game.audio.play('sound', 'win');
+                this.credits += this.currentBet * 2;
+                break;
+            case 'draw':
+                resultType = 'draw';
+                this.scene.game.audio.play('sound', 'win');
+                this.credits += this.currentBet;
+                break;
+            case 'lose':
+            case 'bust':
+                resultType = 'lose';
+                // Кредиты уже списаны при ставке
+                break;
+        }
+
+        let resultPopup = new Result(this.scene, resultType);
+        await resultPopup.show();
+        resultPopup.destroy();
 
         await this.clearHands();
-
+        this.apiClient.resetGame();
         this.startRound();
     }
 
     async clearHands() {
-        await this.hands.player.clear();
-        await this.hands.dealer.clear();
-
-        this.hands.player.destroy();
-        this.hands.dealer.destroy();
+        if (this.hands.player) {
+            await this.hands.player.clear();
+            this.hands.player.destroy();
+        }
+        if (this.hands.dealer) {
+            await this.hands.dealer.clear();
+            this.hands.dealer.destroy();
+        }
     }
 
     onClearBet() {

@@ -15,6 +15,6 @@ export default {
     prefix: 'p33_',
     soundMaxVolume: 1,
     musicMaxVolume: 0.5,
-    responsive: false,
+    responsive: true,
     lockOrientation: 'portrait', // false, portrait, landscape
 };

@@ -29,19 +29,19 @@ export default class extends Phaser.Scene {
     preload() {
         // fonts
         let fonts = ['roboto'];
-        fonts.forEach((font) => this.load.bitmapFont(font, `assets/fonts/${font}_0.png`, `assets/fonts/${font}.fnt`));
+        fonts.forEach((font) => this.load.bitmapFont(font, `fonts/${font}_0.png`, `fonts/${font}.fnt`));
 
-        this.load.json('config', 'assets/config.json');
+        this.load.json('config', 'config.json');
 
         // audiosprites
         this.game.audio.load(this, ['sound', 'music']);
 
         // atlases
-        this.load.setPath(`assets/images`);
+        this.load.setPath(`images`);
         this.load.multiatlas('atlas', `atlas.json?v=${Math.random()}`);
 
         // spine
-        // this.load.setPath('assets/spine');
+        // this.load.setPath('spine');
         // this.load.spine('hero', 'hero.json', 'hero.atlas', true);
     }
 

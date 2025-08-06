@@ -1,4 +1,4 @@
-const isMobile = require('is-mobile');
+import isMobile from 'is-mobile';
 import config from '../startup/config';
 
 export default class {
@@ -11,10 +11,10 @@ export default class {
     }
 
     init() {
-        let image = `url(assets/images/web/play_${this.lock}.png)`;
+        // let image = `url(images/web/play_${this.lock}.png)`;
 
         let div = document.getElementById('turn');
-        div.style.backgroundImage = image;
+        // div.style.backgroundImage = image;
 
         if (!this.isCorrect) {
             div.style.display = 'block';

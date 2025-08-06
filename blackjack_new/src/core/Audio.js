@@ -60,7 +60,7 @@ export default class {
         this.scene = scene;
         this.tracks = tracks;
 
-        let path = 'assets/audio';
+        let path = 'audio';
         let formats = ['.ogg', '.m4a', '.mp3', '.ac3'];
 
         this.scene.load.setPath(path);

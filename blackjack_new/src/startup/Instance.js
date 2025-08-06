@@ -17,7 +17,7 @@ export default class extends Phaser.Game {
         // import scenes
         for (let i = 0; i < names.length; i++) {
             let name = names[i];
-            scenes[name] = await import(`../app/scenes/${name.toLowerCase()}/${name}`);
+            scenes[name] = await import(`../app/scenes/${name.toLowerCase()}/${name}.js`);
         }
 
         // add scenes to the game
