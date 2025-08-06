@@ -70,7 +70,7 @@ services:
   # Игра 21 (Blackjack)
   game-21:
     build:
-      context: ./game
+      context: ./blackjack_new
       dockerfile: Dockerfile
     # ports:
     #   - "5001:5000"
