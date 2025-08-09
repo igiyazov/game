@@ -80,16 +80,16 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels: 
-      - "traefik.http.routers.game-21-js.entrypoints=http"
-      - "traefik.http.routers.game-21-js.rule=Host(`pyramidgames.fun`) && PathPrefix(`/js`)"
-      - "traefik.http.middlewares.game-21-js-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.game-21-js.middlewares=game-21-js-https-redirect"
-      - "traefik.http.routers.game-21-js-secure.entrypoints=https"
-      - "traefik.http.routers.game-21-js-secure.rule=Host(`pyramidgames.fun`) && PathPrefix(`/js`)"
-      - "traefik.http.routers.game-21-js-secure.tls=true"
-      - "traefik.http.routers.game-21-js-secure.service=game-21"
-      - "traefik.http.middlewares.game-21-js-stripprefix.stripprefix.prefixes=/js"
-      - "traefik.http.routers.game-21-js-secure.middlewares=game-21-js-stripprefix"
+      - "traefik.http.routers.game-21.entrypoints=http"
+      - "traefik.http.routers.game-21.rule=Host(`pyramidgames.fun`) || (Host(`pyramidgames.fun`) && PathPrefix(`/js`))"
+      - "traefik.http.middlewares.game-21-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.game-21.middlewares=game-21-https-redirect"
+      - "traefik.http.routers.game-21-secure.entrypoints=https"
+      - "traefik.http.routers.game-21-secure.rule=Host(`pyramidgames.fun`) || (Host(`pyramidgames.fun`) && PathPrefix(`/js`))"
+      - "traefik.http.routers.game-21-secure.tls=true"
+      - "traefik.http.routers.game-21-secure.service=game-21"
+      - "traefik.http.middlewares.game-21-stripprefix.stripprefix.prefixes=/js"
+      - "traefik.http.routers.game-21-secure.middlewares=game-21-stripprefix@docker"
 
 volumes:
   postgres_data:
