@@ -1,0 +1,15 @@
+# Builder stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --silent
+COPY . .
+RUN npm run build
+
+# Runtime stage (serve + dist only)
+FROM node:18-alpine AS runtime
+WORKDIR /app
+RUN npm install -g serve
+COPY --from=builder /app/dist /app/dist
+EXPOSE 5000
+CMD ["serve", "-s", "dist", "-l", "5000"]

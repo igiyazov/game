@@ -1,0 +1,29 @@
+{
+    "name": "blackjack-game",
+    "version": "1.0.0",
+    "description": "Modern Blackjack game built with Phaser.js and Vite",
+    "type": "module",
+    "main": "src/main.js",
+    "scripts": {
+        "dev": "vite",
+        "build": "node scripts/build.mjs",
+        "preview": "vite preview",
+        "deploy": "node -r dotenv/config ./deploy/deploy"
+    },
+    "keywords": ["blackjack", "phaser", "game", "javascript"],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "vite": "^5.0.0",
+        "audiosprite-ffmpeg": "^0.8.1",
+        "dotenv": "^8.2.0",
+        "ftp-deploy": "^2.4.0",
+        "glob": "^7.1.6"
+    },
+    "dependencies": {
+        "axios": "^0.21.1",
+        "is-mobile": "^2.2.2",
+        "lodash": "^4.17.20",
+        "phaser": "^3.52.0"
+    }
+}
