@@ -23,7 +23,8 @@ export default function GameCard({ title, description, image, buttonColor, setCo
 				</h3>
 				
 				<button
-					onClick={() => onClickHandler(title)}
+					// onClick={() => onClickHandler(title)}
+					href={`https://game.pyramidgames.fun`}
 					className={`w-full py-3 px-6 rounded-lg text-white font-semibold text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg ${buttonColor}`}
 				>
 					Играть
