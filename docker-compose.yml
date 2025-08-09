@@ -82,11 +82,13 @@ services:
     labels: 
       - "traefik.enable=true" # Enable Traefik on this service
       - "traefik.http.routers.game-21.entrypoints=http" # Define HTTP entrypoint
-      - "traefik.http.routers.game-21.rule=Host(`game.pyramidgames.fun`)" # Host rule for routing
+      - >-
+        traefik.http.routers.game-21.rule=Host(`game.pyramidgames.fun`) || Host(`game.pyramidgames.fun`) && PathPrefix(`/js`)
       - "traefik.http.middlewares.game-21-https-redirect.redirectscheme.scheme=https" # Redirect HTTP to HTTPS
       - "traefik.http.routers.game-21.middlewares=game-21-https-redirect" # Apply HTTPS redirect middleware
       - "traefik.http.routers.game-21-secure.entrypoints=https" # Secure entrypoint for HTTPS
-      - "traefik.http.routers.game-21-secure.rule=Host(`game.pyramidgames.fun`)"  # Host rule for secure routing
+      - >-
+        traefik.http.routers.game-21-secure.rule=Host(`game.pyramidgames.fun`) || Host(`game.pyramidgames.fun`) && PathPrefix(`/js`)
       - "traefik.http.routers.game-21-secure.tls=true" # Enable TLS for secure connection
       - "traefik.http.routers.game-21-secure.service=game-21" # Internal service for Traefik API
       - "traefik.http.services.game-21.loadbalancer.server.port=5001" # Internal service for Traefik API
