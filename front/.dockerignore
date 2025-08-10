@@ -5,8 +5,10 @@ yarn-debug.log*
 yarn-error.log*
 
 # Production
-/dist
-/build
+# Не исключаем dist: она нужна для runtime-образа
+# /build
+src/
+public/
 
 # Local env files
 .env
