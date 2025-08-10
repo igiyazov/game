@@ -64,7 +64,7 @@ services:
       - "traefik.http.routers.frontend-secure.rule=Host(`pyramidgames.fun`)"  # Host rule for secure routing
       - "traefik.http.routers.frontend-secure.tls=true" # Enable TLS for secure connection
       - "traefik.http.routers.frontend-secure.service=frontend" # Internal service for Traefik API
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000" # Internal service for Traefik API
+      - "traefik.http.services.frontend.loadbalancer.server.port=80" # Internal service for Traefik API
       - "traefik.docker.network=proxy" # Internal service for Traefik API
 
   # Игра 21 (Blackjack)

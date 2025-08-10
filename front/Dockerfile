@@ -1,15 +1,12 @@
-# Runtime-only образ: в контейнер попадают только заранее собранные файлы
-FROM node:18-alpine
+# Runtime-only образ на nginx: только готовые собранные файлы
+FROM nginx:alpine
 
-WORKDIR /app
+# Копируем готовые файлы в стандартную папку nginx
+COPY dist/ /usr/share/nginx/html/
 
-# Устанавливаем легковесный статический сервер
-RUN npm install -g serve
+# Копируем кастомную конфигурацию nginx для SPA
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Копируем только папку dist, собранную вне Docker
-COPY dist/ /app/dist/
+EXPOSE 80
 
-EXPOSE 3000
-
-# Запускаем сервер статических файлов с поддержкой SPA
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# nginx запускается автоматически
